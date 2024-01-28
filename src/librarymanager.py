@@ -3,7 +3,29 @@ from bs4 import BeautifulSoup as Soup, element
 from datetime import date, datetime, timedelta
 from threading import Thread
 from ipywidgets import Output
+from optimallogger import OptimalLogger
 
+today = date.today()
+thisyear = str(today.year)
+logger = OptimalLogger.getInstance()
+
+year_pt = re.compile(r"\d{4}")
+featurettes_pt = re.compile(r"[F,f]eature[a-z]*|[E,e]xtras?")
+mf_pt = re.compile(r"((?<=\b[S,s])|(?<=[S,s]eason)|(?<=[S,s]eason[\s,\.]))([1-9][0-9]?|0?[1-9])")
+eps_pt = re.compile(r"\b([Ss]\d{1,2}[Ee]\d{1,2}|\d{1,2}[xX]\d{1,2}|[Ss]n?\d{1,2}\s?[Ee](ps?)?\d{1,2})(?=[\s\.])")
+check_sn_pt = re.compile(r"[\s,\.]([S,s]\d{1,2}|[Ss][Ee][Aa][Ss][Oo][Nn]([\s,\.]?)\d{1,2})(?=[\s,\.]|e\d{1,2}-\d{1,2})(?!\sto)")
+yearsuff_pt = re.compile(r"\d{4}$")
+langs_pt = re.compile(r"(?<=\_|-|\.|\s)([Aa]rabic|ar|[Ee]nglish|en|[Ff]rench|fr|[Gg]erman|de|[Ff]innish|fi|[Dd]utch|nl|[Dd]anish|da|[Gg]reek|el|[Hh]indi|hi|[Ii]ndonesian|id|[Ii]talian|it|[Jj]apanese|ja|Korean|ko|Norwegian|no|Persian|fa|Polish|pl|Portuguese|pt|Russian|ru|Swedish|sv|Thai|th|Ukrainian|uk|Urdu|ur|Vietnamese|vi|spanish|es|Romanian|ro|Hungarian|hu)", flags= re.IGNORECASE)
+digitssuff_pt = re.compile(r"\s\d{1,2}$")
+season_pt0 = re.compile(r"([S,s]|([S,s]easons?\s?))\d{1,2}")
+season_pt1 = re.compile(r"\b([S,s]|[S,s]eason([\s,\.]?))\d{1,2}")
+season_number_pt = re.compile(r"([1-9][0-9]?)")
+sd_pt = re.compile(r"(\/content\/drive\/Shareddrives\/)[A-Za-z0-9]+(?=\/)")
+imdbcount_pt = re.compile(r"\d+(?=\stitles?)")
+l337xpages_pt = re.compile(r'(?<=/)\d+(?=/)')
+stars_pt = re.compile(r"(?<=Stars:)<a href.*</a>")
+director_pt = re.compile(r"(((?<=Director:)<a href.*</a>)|((?<=Directors:)<a href.*</a>))(?=<span)")
+split_musictitle_pt = re.compile(r"[\[\]\(]")
 
 def transstring(name): 
     if not name:
@@ -27,7 +49,7 @@ def transtitle(name, show = False):
             name.split(dgts[-1])[0]
             year = dgts[-1]
     table = name.maketrans("",""," '(#$%-,.;:!?)")
-    return name.translate(table).lower() + year         # if not show else name.translate(table).lower()
+    return name.translate(table).lower() + year         # if not show else name.translate(table).lower() 
 
 def get_year(name): 
     dgts = year_pt.findall(name.split('1080')[0])
